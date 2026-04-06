@@ -1,0 +1,8 @@
+# Compiled output
+dist/
+
+# Environment variables — never commit real secrets
+.env
+
+# Dependencies
+node_modules/

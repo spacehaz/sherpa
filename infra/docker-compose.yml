@@ -1,0 +1,29 @@
+## docker-compose.yml
+## Defines local infrastructure for development.
+## Run with: docker compose up -d
+## Starts PostgreSQL — credentials must match DATABASE_URL in apps/backend/.env
+
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    # alpine = smaller image, production-grade postgres version
+    container_name: sherpa_postgres
+    # Restart on crash or reboot, but not if manually stopped
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: sherpa
+      POSTGRES_PASSWORD: sherpa
+      POSTGRES_DB: sherpa
+    ports:
+      # Maps host:5432 → container:5432 so NestJS on localhost can reach postgres
+      - '5432:5432'
+    volumes:
+      # Named volume — postgres data persists between container restarts and removals
+      # To wipe the DB: docker compose down -v
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  # Registers the volume with Docker using default settings (Docker manages the host path)
+  postgres_data:

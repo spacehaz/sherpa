@@ -1,0 +1,165 @@
+// schema.prisma
+// Single source of truth for the database structure.
+// Prisma reads this file to generate migrations and the Prisma client.
+// Enums are duplicated from @sherpa/shared/enums.ts — keep both in sync when changing.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  // Reads DATABASE_URL from .env at migration and generate time
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum OfferStatus {
+  pending
+  accepted
+  finished
+}
+
+enum RequestStatus {
+  pending
+  accepted
+  finished
+}
+
+enum DealStatus {
+  pending
+  accepted
+  rejected
+  completed
+}
+
+enum ItemCategory {
+  electronics
+  clothing
+  accessories
+  cosmetics
+  food
+  books
+  other
+}
+
+// ─── Models ───────────────────────────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  gender       String?
+  hometown     String?
+  // Cached average — updated by RatingsService after every new Rating insert
+  rating       Float    @default(0)
+  createdAt    DateTime @default(now())
+
+  offers          Offer[]
+  requests        Request[]
+  initiatedDeals  Deal[]        @relation("InitiatedDeals")
+  respondedDeals  Deal[]        @relation("RespondedDeals")
+  sentMessages    DealMessage[]
+  ratingsGiven    Rating[]      @relation("RatingsGiven")
+  ratingsReceived Rating[]      @relation("RatingsReceived")
+
+  traveledDeals  Deal[]  @relation("TravelerDeals")
+}
+
+model Offer {
+  id            String       @id @default(uuid())
+  userId        String
+  title         String
+  description   String?
+  category      ItemCategory
+  store         String?
+  priceOriginal Float
+  markupPercent Float
+  deliveryDate  DateTime
+  size          String?
+  weight        Float?
+  status        OfferStatus  @default(pending)
+  createdAt     DateTime     @default(now())
+
+  user  User   @relation(fields: [userId], references: [id])
+  deals Deal[]
+}
+
+model Request {
+  id            String       @id @default(uuid())
+  userId        String
+  title         String
+  description   String?
+  category      ItemCategory
+  store         String?
+  priceOriginal Float
+  markupPercent Float
+  deliveryDate  DateTime
+  size          String?
+  weight        Float?
+  status        RequestStatus  @default(pending)
+  createdAt     DateTime     @default(now())
+
+  user  User   @relation(fields: [userId], references: [id])
+  deals Deal[]
+}
+
+model Deal {
+  id                  String     @id @default(uuid())
+  // Either offerId or requestId must be set — enforced at service level
+  offerId             String?
+  requestId           String?
+  initiatorId         String
+  responderId         String
+  agreedMarkupPercent Float?
+  // Final agreed price — only stored here, never on Offer or Request
+  agreedPrice         Float?
+  status              DealStatus @default(pending)
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+
+  // offerId → Offer.id (nullable — deal may be based on a request instead)
+  offer     Offer?        @relation(fields: [offerId], references: [id])
+  // requestId → Request.id (nullable — deal may be based on an offer instead)
+  request   Request?      @relation(fields: [requestId], references: [id])
+  // Two relations to User — named to disambiguate which foreign key maps to which
+  initiator User          @relation("InitiatedDeals", fields: [initiatorId], references: [id])
+  responder User          @relation("RespondedDeals", fields: [responderId], references: [id])
+  messages  DealMessage[]
+  ratings   Rating[]
+
+
+  travelerId  String
+  traveler  User  @relation("TravelerDeals", fields: [travelerId], references: [id])
+}
+
+model DealMessage {
+  id                    String   @id @default(uuid())
+  dealId                String
+  senderId              String
+  message               String
+  // Optional — sent when a party proposes a new markup during negotiation
+  proposedMarkupPercent Float?
+  createdAt             DateTime @default(now())
+
+  deal   Deal @relation(fields: [dealId], references: [id])
+  sender User @relation(fields: [senderId], references: [id])
+}
+
+model Rating {
+  id         String   @id @default(uuid())
+  fromUserId String
+  toUserId   String
+  dealId     String
+  // Score 1–5 — enforced at service level via DTO validation
+  score      Int
+  comment    String?
+  createdAt  DateTime @default(now())
+
+  // Two relations to User — named to disambiguate who gave and who received the rating
+  fromUser User @relation("RatingsGiven", fields: [fromUserId], references: [id])
+  toUser   User @relation("RatingsReceived", fields: [toUserId], references: [id])
+  deal     Deal @relation(fields: [dealId], references: [id])
+}

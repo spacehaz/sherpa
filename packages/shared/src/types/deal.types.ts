@@ -1,0 +1,23 @@
+import { DealStatus } from '../enums';
+
+export interface Deal {
+  id: string;
+  offerId?: string;
+  requestId?: string;
+  initiatorId: string;
+  responderId: string;
+  agreedMarkupPercent?: number;
+  agreedPrice?: number;
+  status: DealStatus;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface DealMessage {
+  id: string;
+  dealId: string;
+  senderId: string;
+  message: string;
+  proposedMarkupPercent?: number;
+  createdAt: Date;
+}
