@@ -3,7 +3,7 @@
 ## Run with: docker compose up -d
 ## Starts PostgreSQL — credentials must match DATABASE_URL in apps/backend/.env
 
-version: '3.9'
+version: "3.9"
 
 services:
   postgres:
@@ -18,11 +18,32 @@ services:
       POSTGRES_DB: sherpa
     ports:
       # Maps host:5432 → container:5432 so NestJS on localhost can reach postgres
-      - '5432:5432'
+      - "5432:5432"
     volumes:
       # Named volume — postgres data persists between container restarts and removals
       # To wipe the DB: docker compose down -v
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sherpa -d sherpa"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ..
+      dockerfile: apps/backend/Dockerfile
+    container_name: sherpa_backend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://sherpa:sherpa@postgres:5432/sherpa
+      JWT_SECRET: change-me-in-production
+      PORT: 3000
+    depends_on:
+      postgres:
+        condition: service_healthy
 
 volumes:
   # Registers the volume with Docker using default settings (Docker manages the host path)

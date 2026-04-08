@@ -7,7 +7,7 @@
  *   PATCH /api/users/me
  */
 
-import { Controller, Get, Body, Patch, UseGuards } from '@nestjs/common';
+import { Controller, Get, Body, Patch, UseGuards, Param } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -16,6 +16,11 @@ import { CurrentUser, AuthUser } from '../auth/decorators/current-user.decorator
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  @Get(':id')
+  getUserById(@Param('id') id: string) {
+    return this.usersService.getUser(id);
+  }
 
   @UseGuards(JwtAuthGuard)
   @Get('me')
