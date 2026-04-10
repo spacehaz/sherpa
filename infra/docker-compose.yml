@@ -36,7 +36,7 @@ services:
     container_name: sherpa_backend
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "3001:3000"
     environment:
       DATABASE_URL: postgresql://sherpa:sherpa@postgres:5432/sherpa
       JWT_SECRET: change-me-in-production
