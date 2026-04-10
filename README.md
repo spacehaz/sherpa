@@ -38,7 +38,7 @@ cd apps/backend
 yarn start:dev
 ```
 
-The API will be available at `http://localhost:3000/api`.
+The API will be available here: `http://localhost:3000/api`.
 
 ## Shared types
 
