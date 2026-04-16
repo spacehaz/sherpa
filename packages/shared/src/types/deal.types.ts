@@ -1,4 +1,10 @@
-import { DealStatus } from '../enums';
+import { DealStatus, ItemCategory } from '../enums'
+
+export interface DealItem {
+  id: string;
+  title: string;
+  category: ItemCategory;
+}
 
 export interface Deal {
   id: string;
@@ -11,6 +17,8 @@ export interface Deal {
   status: DealStatus;
   createdAt: Date;
   updatedAt: Date;
+  offer?: DealItem;
+  request?: DealItem;
 }
 
 export interface DealMessage {
