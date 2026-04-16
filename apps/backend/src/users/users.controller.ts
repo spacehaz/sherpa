@@ -17,15 +17,15 @@ import { CurrentUser, AuthUser } from '../auth/decorators/current-user.decorator
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get(':id')
-  getUserById(@Param('id') id: string) {
-    return this.usersService.getUser(id);
-  }
-
   @UseGuards(JwtAuthGuard)
   @Get('me')
   getUser(@CurrentUser() user: AuthUser) {
     return this.usersService.getUser(user.id);
+  }
+
+  @Get(':id')
+  getUserById(@Param('id') id: string) {
+    return this.usersService.getUser(id);
   }
 
   @UseGuards(JwtAuthGuard)

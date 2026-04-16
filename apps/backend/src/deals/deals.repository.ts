@@ -17,7 +17,13 @@ export class DealsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   findById(id: string) {
-    return this.prisma.deal.findUnique({ where: { id } });
+    return this.prisma.deal.findUnique({
+      where: { id },
+      include: {
+        offer: { select: { id: true, title: true, category: true } },
+        request: { select: { id: true, title: true, category: true } },
+      }
+    });
   }
 
   findMyDeals(
@@ -40,6 +46,10 @@ export class DealsRepository {
       orderBy: property ? { [property]: direction ?? 'asc' } : { createdAt: 'desc' },
       skip: (page - 1) * limit,
       take: limit,
+      include: {
+        offer: { select: { id: true, title: true, category: true } },
+        request: { select: { id: true, title: true, category: true } },
+      }
     });
   }
 
