@@ -37,8 +37,15 @@ export class AuthService {
       name: dto.name,
     });
 
-    // Return a JWT token so the user is logged in immediately after registration
-    return this.signToken(user.id, user.email);
+    return {
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+      },
+      ...this.signToken(user.id, user.email),
+    };
+
   }
 
   async login(dto: LoginDto) {
@@ -54,7 +61,14 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    return this.signToken(user.id, user.email);
+    return {
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+      },
+      ...this.signToken(user.id, user.email),
+    };
   }
 
   private signToken(userId: string, email: string) {

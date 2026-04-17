@@ -1,3 +1,5 @@
-  export type TProps = {
-    children: React.ReactNode
-  }
+import { ReactNode } from 'react'
+
+export type TProps = {
+  children: ReactNode
+}
