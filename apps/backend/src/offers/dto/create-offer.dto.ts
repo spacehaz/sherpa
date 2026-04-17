@@ -18,6 +18,12 @@ export class CreateOfferDto {
   @IsEnum(ItemCategory)
   category!: ItemCategory;
 
+  @IsString()
+  from!: string;
+
+  @IsString()
+  to!: string;
+
   @IsOptional()
   @IsString()
   store?: string;

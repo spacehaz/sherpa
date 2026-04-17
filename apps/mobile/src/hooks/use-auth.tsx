@@ -18,14 +18,14 @@ export function useAuth() {
     setError(null)       // clear any previous error
 
     try {
-      // POST /auth/login — returns { user, token }
+      // POST /auth/login — returns { user, accessToken }
       const { data } = await loginRequest({ email, password })
 
       // save token to device keychain so it survives app restarts
-      await SecureStore.setItemAsync('token', data.token)
+      await SecureStore.setItemAsync('token', data.accessToken)
 
       // put user + token into Redux so components can read them reactively
-      dispatch(setCredentials({ user: data.user, token: data.token }))
+      dispatch(setCredentials({ user: data.user, token: data.accessToken }))
 
       // replace instead of push — user can't go back to login by pressing back
       router.replace('/(tabs)/offers')
@@ -46,8 +46,8 @@ export function useAuth() {
     setError(null)
     try {
       const { data } = await registerRequest({ email, password, name })
-      await SecureStore.setItemAsync('token', data.token)
-      dispatch(setCredentials({ user: data.user, token: data.token }))
+      await SecureStore.setItemAsync('token', data.accessToken)
+      dispatch(setCredentials({ user: data.user, token: data.accessToken }))
       router.replace('/(tabs)/offers')
     } catch (e: any) {
       setError(e?.response?.data?.message ?? 'Registration failed')

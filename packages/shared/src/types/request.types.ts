@@ -11,6 +11,8 @@ export interface Request {
   markupPercent: number;
   deliveryDate: Date;
   size?: string;
+  from?: string;
+  to: string;
   weight?: number;
   status: RequestStatus;
   createdAt: Date;

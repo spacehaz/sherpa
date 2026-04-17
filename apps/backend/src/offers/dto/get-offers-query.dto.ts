@@ -18,6 +18,14 @@ export class GetOffersQueryDto {
   property?: string;
 
   @IsOptional()
+  @IsString()
+  from?: string;
+
+  @IsOptional()
+  @IsString()
+  to?: string;
+
+  @IsOptional()
   @IsIn(['asc', 'desc'])
   direction?: 'asc' | 'desc';
 

@@ -24,8 +24,9 @@ export default function Input({
         secureTextEntry={secureTextEntry}
         keyboardType={keyboardType}
         autoCapitalize={autoCapitalize}
+        style={{ height: 48 }}
         className={`
-          border rounded-lg px-4 py-3 text-sm text-gray-800 bg-gray-50
+          border rounded-lg px-4 text-sm text-gray-800 bg-gray-50
           ${error ? 'border-red-400' : 'border-gray-200'}
         `}
       />

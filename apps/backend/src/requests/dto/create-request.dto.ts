@@ -20,6 +20,13 @@ export class CreateRequestDto {
 
   @IsOptional()
   @IsString()
+  from?: string;
+
+  @IsString()
+  to!: string;
+
+  @IsOptional()
+  @IsString()
   store?: string;
 
   @IsOptional()

@@ -13,5 +13,7 @@ export interface Offer {
   size?: string;
   weight?: number;
   status: OfferStatus;
+  from: string;
+  to: string;
   createdAt: Date;
 }

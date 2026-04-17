@@ -77,6 +77,8 @@ model Offer {
   store         String?
   priceOriginal Float
   markupPercent Float
+  from          String
+  to            String
   deliveryDate  DateTime
   size          String?
   weight        Float?
@@ -93,6 +95,8 @@ model Request {
   title         String
   description   String?
   category      ItemCategory
+  from          String?
+  to            String
   store         String?
   priceOriginal Float
   markupPercent Float
