@@ -3,6 +3,8 @@ import { Request } from "@sherpa/shared"
 export type TCreateRequestBody = {
   title: string
   category: string
+  from?: string
+  to: string
   priceOriginal: number
   markupPercent: number
   deliveryDate: string

@@ -3,6 +3,8 @@ import { Offer } from "@sherpa/shared"
 export type TCreateOfferBody = {
   title: string
   category: string
+  from: string
+  to: string
   priceOriginal: number
   markupPercent: number
   deliveryDate: string

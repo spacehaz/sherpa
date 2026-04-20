@@ -1,6 +1,6 @@
-import { FlatList, View, Text, ActivityIndicator, TouchableOpacity } from 'react-native'
+import { FlatList, View, Text, ActivityIndicator } from 'react-native'
 import { useRequestsInfinite } from '../../src/hooks/use-requests'
-import { RequestCard } from '../../src/components'
+import { RequestCard, CreateItemFab } from '../../src/components'
 
 export default function MyRequestsScreen() {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError } = useRequestsInfinite()
@@ -24,9 +24,7 @@ export default function MyRequestsScreen() {
         ListFooterComponent={isFetchingNextPage ? <ActivityIndicator className="py-4" /> : null}
         contentContainerStyle={{ padding: 16 }}
       />
-      <TouchableOpacity className="absolute bottom-6 right-6 bg-gray-800 px-5 py-3 rounded-xl">
-        <Text className="text-white font-semibold">+ New request</Text>
-      </TouchableOpacity>
+      <CreateItemFab type="request" />
     </View>
   )
 }

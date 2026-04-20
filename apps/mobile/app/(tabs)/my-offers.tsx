@@ -1,6 +1,6 @@
-import { FlatList, View, Text, ActivityIndicator, TouchableOpacity } from 'react-native'
+import { FlatList, View, Text, ActivityIndicator } from 'react-native'
 import { useOffersInfinite } from '../../src/hooks/use-offers'
-import { OfferCard } from '../../src/components'
+import { OfferCard, CreateItemFab } from '../../src/components'
 
 export default function MyOffersScreen() {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError } = useOffersInfinite()
@@ -24,9 +24,7 @@ export default function MyOffersScreen() {
         ListFooterComponent={isFetchingNextPage ? <ActivityIndicator className="py-4" /> : null}
         contentContainerStyle={{ padding: 16 }}
       />
-      <TouchableOpacity className="absolute bottom-6 right-6 bg-gray-800 px-5 py-3 rounded-xl">
-        <Text className="text-white font-semibold">+ New offer</Text>
-      </TouchableOpacity>
+      <CreateItemFab type="offer" />
     </View>
   )
 }
