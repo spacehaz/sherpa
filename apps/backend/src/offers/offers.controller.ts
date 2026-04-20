@@ -27,6 +27,12 @@ export class OffersController {
     return this.offersService.findAll(params);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('/my')
+  getMyOffers(@CurrentUser() user: AuthUser, @Query() params: GetOffersQueryDto) {
+    return this.offersService.findAllByUser(user.id, params);
+  }
+
   @Get('/:id')
   getOffer(@Param('id') id: string) {
     return this.offersService.findById(id);

@@ -74,4 +74,8 @@ export class RequestsService {
   ) {
     return await this.requestsRepository.findAll(params);
   }
+
+  async findAllByUser (userId: string, params: GetRequestsQueryDto) {
+    return await this.requestsRepository.findAllByUser(userId, params);
+  }
 }

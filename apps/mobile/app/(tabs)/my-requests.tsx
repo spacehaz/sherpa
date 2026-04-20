@@ -1,9 +1,9 @@
 import { FlatList, View, Text, ActivityIndicator } from 'react-native'
-import { useRequestsInfinite } from '../../src/hooks/use-requests'
+import { useMyRequestsInfinite } from '../../src/hooks/use-requests'
 import { RequestCard, CreateItemFab } from '../../src/components'
 
 export default function MyRequestsScreen() {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError } = useRequestsInfinite()
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError } = useMyRequestsInfinite()
   const items = data?.pages.flat() ?? []
 
   if (isLoading) return <ActivityIndicator className="flex-1" />

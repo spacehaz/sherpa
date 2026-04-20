@@ -18,6 +18,16 @@ export class RequestsRepository {
     return this.prisma.request.findUnique({ where: { id } });
   }
 
+  findAllByUser(userId: string, params: GetRequestsQueryDto) {
+    const { limit = 20, page = 1, status, property, direction } = params
+    return this.prisma.request.findMany({
+      where: { userId, ...(status ? { status } : {}) },
+      orderBy: property ? { [property]: direction ?? 'asc' } : { createdAt: 'desc' },
+      skip: (page - 1) * limit,
+      take: limit,
+    })
+  }
+
   findAll(params: GetRequestsQueryDto) {
     const { 
       status,

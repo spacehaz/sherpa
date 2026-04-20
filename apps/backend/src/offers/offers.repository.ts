@@ -18,6 +18,16 @@ export class OffersRepository {
     return this.prisma.offer.findUnique({ where: { id } });
   }
 
+  findAllByUser(userId: string, params: GetOffersQueryDto) {
+    const { limit = 20, page = 1, status, property, direction } = params
+    return this.prisma.offer.findMany({
+      where: { userId, ...(status ? { status } : {}) },
+      orderBy: property ? { [property]: direction ?? 'asc' } : { createdAt: 'desc' },
+      skip: (page - 1) * limit,
+      take: limit,
+    })
+  }
+
   findAll(params: GetOffersQueryDto) {
     const { 
       status,

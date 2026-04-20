@@ -8,6 +8,11 @@ export const getOffers: TGetOffers = async (params) => {
   return data
 }
 
+export const getMyOffers: TGetOffers = async (params) => {
+  const { data } = await apiClient.get<Offer[]>('/offers/my', { params })
+  return data
+}
+
 export const createOffer: TCreateOffer = async (body) => {
   const { data } = await apiClient.post<Offer>('/offers', body)
   return data

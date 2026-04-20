@@ -1,9 +1,9 @@
 import { FlatList, View, Text, ActivityIndicator } from 'react-native'
-import { useOffersInfinite } from '../../src/hooks/use-offers'
+import { useMyOffersInfinite } from '../../src/hooks/use-offers'
 import { OfferCard, CreateItemFab } from '../../src/components'
 
 export default function MyOffersScreen() {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError } = useOffersInfinite()
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError } = useMyOffersInfinite()
   const items = data?.pages.flat() ?? []
 
   if (isLoading) return <ActivityIndicator className="flex-1" />

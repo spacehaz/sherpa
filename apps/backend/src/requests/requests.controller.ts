@@ -27,6 +27,12 @@ export class RequestsController {
     return this.requestsService.findAll(params);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('/my')
+  getMyRequests(@CurrentUser() user: AuthUser, @Query() params: GetRequestsQueryDto) {
+    return this.requestsService.findAllByUser(user.id, params);
+  }
+
   @Get('/:id')
   getOffer(@Param('id') id: string) {
     return this.requestsService.findById(id);

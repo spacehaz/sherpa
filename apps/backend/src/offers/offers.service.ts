@@ -74,4 +74,8 @@ export class OffersService {
   ) {
     return await this.offersRepository.findAll(params);
   }
+
+  async findAllByUser (userId: string, params: GetOffersQueryDto) {
+    return await this.offersRepository.findAllByUser(userId, params);
+  }
 }
