@@ -15,6 +15,7 @@
 import { Controller, Get, Body, Patch, Post, Delete, UseGuards, Query, Param } from '@nestjs/common';
 import { DealsService } from './deals.service';
 import { UpdateDealStatusDto } from './dto/update-deal-status.dto';
+import { UpdateDealMarkupDto } from './dto/update-deal-markup.dto';
 import { CreateDealDto } from './dto/create-deal.dto';
 import { GetMyDealsQueryDto } from './dto/get-my-deals-query.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -54,6 +55,12 @@ export class DealsController {
   @Patch('/:id/status')
   updateDeal(@CurrentUser() user: AuthUser, @Param('id') id: string, @Body() dealData: UpdateDealStatusDto) {
     return this.dealsService.updateDealStatus(user.id, id, dealData);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('/:id/markup')
+  updateMarkup(@CurrentUser() user: AuthUser, @Param('id') id: string, @Body() body: UpdateDealMarkupDto) {
+    return this.dealsService.updateMarkup(user.id, id, body);
   }
 
   @UseGuards(JwtAuthGuard)

@@ -7,6 +7,7 @@
 import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { DealsRepository } from './deals.repository';
 import { UpdateDealStatusDto } from './dto/update-deal-status.dto';
+import { UpdateDealMarkupDto } from './dto/update-deal-markup.dto';
 import { CreateDealDto } from './dto/create-deal.dto';
 import { OffersRepository } from 'src/offers/offers.repository';
 import { RequestsRepository } from 'src/requests/requests.repository';
@@ -135,10 +136,16 @@ export class DealsService {
       if (userId === responderId) {
         throw new ForbiddenException('Cannot create a deal for own offer');
       }
+
+      const existing = await this.dealsRepository.findActiveByInitiatorAndOffer(userId, offerId)
+      if (existing) {
+        throw new BadRequestException('You already have an active deal for this offer');
+      }
+
       return await this.dealsRepository.create(
         userId,
         responderId,
-        responderId, // traveler is the same as responderId
+        responderId,
         dealData
       )
     }
@@ -155,13 +162,53 @@ export class DealsService {
         throw new ForbiddenException('Cannot create a deal for own request');
       }
 
+      const existing = await this.dealsRepository.findActiveByInitiatorAndOffer(userId, undefined, requestId)
+      if (existing) {
+        throw new BadRequestException('You already have an active deal for this request');
+      }
+
       return await this.dealsRepository.create(
         userId,
         responderId,
-        userId, // traveler is the same as userId
+        userId,
         dealData
       )
     }
+  }
+
+  async updateMarkup (
+    userId: string,
+    dealId: string,
+    { markupPercent }: UpdateDealMarkupDto,
+  ) {
+    const deal = await this.dealsRepository.findById(dealId)
+    if (!deal) throw new NotFoundException('Deal not found')
+
+    const { initiatorId, responderId, offerId, requestId, status } = deal
+
+    if (status !== 'pending') {
+      throw new BadRequestException('Markup can only be updated on a pending deal')
+    }
+
+    if (userId !== initiatorId && userId !== responderId) {
+      throw new ForbiddenException('Only deal participants can accept a markup proposal')
+    }
+
+    let priceOriginal: number
+
+    if (offerId) {
+      const offer = await this.offersRepository.findById(offerId)
+      if (!offer) throw new NotFoundException('Offer not found')
+      priceOriginal = offer.priceOriginal
+    } else {
+      const request = await this.requestsRepository.findById(requestId!)
+      if (!request) throw new NotFoundException('Request not found')
+      priceOriginal = request.priceOriginal
+    }
+
+    const agreedPrice = Math.round(priceOriginal * (1 + markupPercent / 100))
+
+    return this.dealsRepository.updateMarkup(dealId, markupPercent, agreedPrice)
   }
 
   async findMyDeals (

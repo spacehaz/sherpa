@@ -1,10 +1,23 @@
 import { View, Text } from 'react-native'
-import { Card } from '../ui'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { router } from 'expo-router'
+import { Card, Button } from '../ui'
 import { TProps } from './types'
-
+import { createDeal } from '../../api/deals'
+import { useAppSelector } from '../../store/hooks'
 
 export default function OfferCard({ offer }: TProps) {
+  const queryClient = useQueryClient()
+  const currentUserId = useAppSelector(state => state.auth.user?.id)
   const buyerPrice = Math.round(offer.priceOriginal * (1 + offer.markupPercent / 100))
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: () => createDeal({ offerId: offer.id }),
+    onSuccess: (deal) => {
+      queryClient.invalidateQueries({ queryKey: ['deals', 'my'] })
+      router.push(`/deal/${deal.id}`)
+    },
+  })
 
   return (
     <Card>
@@ -19,7 +32,7 @@ export default function OfferCard({ offer }: TProps) {
         <Text className="text-xs text-gray-400 mb-2">{offer.store}</Text>
       )}
 
-      <View className="flex-row items-center justify-between">
+      <View className="flex-row items-center justify-between mb-3">
         <Text className="text-sm text-gray-600">
           ${offer.priceOriginal} + {offer.markupPercent}% → ${buyerPrice}
         </Text>
@@ -27,6 +40,10 @@ export default function OfferCard({ offer }: TProps) {
           {new Date(offer.deliveryDate).toLocaleDateString()}
         </Text>
       </View>
+
+      {offer.userId !== currentUserId && (
+        <Button title="Deal" onPress={() => mutate()} loading={isPending} />
+      )}
     </Card>
   )
 }

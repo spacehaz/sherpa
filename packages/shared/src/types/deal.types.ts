@@ -12,6 +12,7 @@ export interface Deal {
   requestId?: string;
   initiatorId: string;
   responderId: string;
+  travelerId: string;
   agreedMarkupPercent?: number;
   agreedPrice?: number;
   status: DealStatus;

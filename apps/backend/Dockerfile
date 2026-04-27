@@ -8,6 +8,7 @@ WORKDIR /app
 
 # Copy only manifests first — if source changes but these don't,
 # Docker reuses the cached yarn install layer (saves minutes on rebuilds)
+# COPY <from-context> <to-container>
 COPY package.json yarn.lock ./
 COPY apps/backend/package.json ./apps/backend/package.json
 COPY packages/shared/package.json ./packages/shared/package.json

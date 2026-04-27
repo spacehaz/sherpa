@@ -85,6 +85,16 @@ export class DealsRepository {
     });
   }
 
+  findActiveByInitiatorAndOffer(initiatorId: string, offerId?: string, requestId?: string) {
+    return this.prisma.deal.findFirst({
+      where: {
+        initiatorId,
+        status: { in: ['pending', 'accepted'] },
+        ...(offerId ? { offerId } : { requestId }),
+      },
+    });
+  }
+
   create(
     userId: string,
     responderId: string,
@@ -104,6 +114,13 @@ export class DealsRepository {
   ) {
     return this.prisma.dealMessage.create({
       data: { ...dto, dealId, senderId }
+    });
+  }
+
+  updateMarkup(dealId: string, agreedMarkupPercent: number, agreedPrice: number) {
+    return this.prisma.deal.update({
+      where: { id: dealId },
+      data: { agreedMarkupPercent, agreedPrice },
     });
   }
 

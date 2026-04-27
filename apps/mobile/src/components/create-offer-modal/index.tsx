@@ -84,7 +84,7 @@ export function CreateOfferModal({ visible, onClose }: Props) {
             {showCategoryPicker && (
               <Picker
                 selectedValue={category}
-                onValueChange={(v) => setCategory(v)}
+                onValueChange={(v) => { setCategory(v); setShowCategoryPicker(false) }}
               >
                 {CATEGORIES.map(c => (
                   <Picker.Item key={c.value} label={c.label} value={c.value} />
