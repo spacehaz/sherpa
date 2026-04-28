@@ -13,8 +13,18 @@ export const getMyRequests: TGetRequests = async (params) => {
   return data
 }
 
-export const createRequest: TCreateRequest = async (body) => {
-  const { data } = await apiClient.post<Request>('/requests', body)
+export const createRequest: TCreateRequest = async (body, imageUri?: string) => {
+  const formData = new FormData()
+  Object.entries(body).forEach(([key, value]) => {
+    if (value != null) formData.append(key, String(value))
+  })
+  if (imageUri) {
+    const ext = imageUri.split('.').pop() ?? 'jpg'
+    formData.append('image', { uri: imageUri, type: `image/${ext}`, name: `image.${ext}` } as any)
+  }
+  const { data } = await apiClient.post<Request>('/requests', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
   return data
 }
 

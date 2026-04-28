@@ -14,4 +14,4 @@ export type TCreateRequestBody = {
   weight?: number
 }
 
-export type TCreateRequest = (body: TCreateRequestBody) => Promise<Request>
+export type TCreateRequest = (body: TCreateRequestBody, imageUri?: string) => Promise<Request>

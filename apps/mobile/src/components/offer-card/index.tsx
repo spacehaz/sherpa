@@ -1,4 +1,4 @@
-import { View, Text } from 'react-native'
+import { View, Text, Image } from 'react-native'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { router } from 'expo-router'
 import { Card, Button } from '../ui'
@@ -21,6 +21,13 @@ export default function OfferCard({ offer, onDelete }: TProps) {
 
   return (
     <Card>
+      {offer.imageUrl && (
+        <Image
+          source={{ uri: offer.imageUrl }}
+          className="w-full h-40 rounded-lg mb-3"
+          resizeMode="cover"
+        />
+      )}
       <View className="flex-row items-center justify-between mb-2">
         <Text className="text-base font-semibold text-gray-800 flex-1" numberOfLines={1}>
           {offer.title}

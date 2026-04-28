@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Modal, View, Text, ScrollView, TouchableOpacity } from 'react-native'
+import { Modal, View, Text, ScrollView, TouchableOpacity, Image } from 'react-native'
 import { Picker } from '@react-native-picker/picker'
 import DateTimePicker from '@react-native-community/datetimepicker'
+import * as ImagePicker from 'expo-image-picker'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ItemCategory } from '@sherpa/shared'
 import { createRequest } from '../../api/requests'
@@ -29,9 +30,11 @@ export function CreateRequestModal({ visible, onClose }: Props) {
   const [description, setDescription] = useState('')
   const [showCategoryPicker, setShowCategoryPicker] = useState(false)
   const [showDatePicker, setShowDatePicker] = useState(false)
+  const [imageUri, setImageUri] = useState<string | null>(null)
 
   const { mutate, isPending, error } = useMutation({
-    mutationFn: createRequest,
+    mutationFn: ({ body, imageUri }: { body: Parameters<typeof createRequest>[0]; imageUri?: string }) =>
+      createRequest(body, imageUri),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['requests'] })
       queryClient.invalidateQueries({ queryKey: ['my-requests'] })
@@ -40,22 +43,33 @@ export function CreateRequestModal({ visible, onClose }: Props) {
     },
   })
 
+  async function pickImage() {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 0.8,
+    })
+    if (!result.canceled) setImageUri(result.assets[0].uri)
+  }
+
   function reset() {
     setTitle(''); setCategory(ItemCategory.ELECTRONICS); setFrom(''); setTo('')
     setPriceOriginal(''); setMarkupPercent(''); setDeliveryDate(new Date()); setDescription('')
-    setShowCategoryPicker(false); setShowDatePicker(false)
+    setShowCategoryPicker(false); setShowDatePicker(false); setImageUri(null)
   }
 
   function handleSubmit() {
     mutate({
-      title,
-      category,
-      from: from || undefined,
-      to,
-      priceOriginal: parseFloat(priceOriginal),
-      markupPercent: parseFloat(markupPercent),
-      deliveryDate: deliveryDate.toISOString(),
-      description: description || undefined,
+      body: {
+        title,
+        category,
+        from: from || undefined,
+        to,
+        priceOriginal: parseFloat(priceOriginal),
+        markupPercent: parseFloat(markupPercent),
+        deliveryDate: deliveryDate.toISOString(),
+        description: description || undefined,
+      },
+      imageUri: imageUri ?? undefined,
     })
   }
 
@@ -119,6 +133,21 @@ export function CreateRequestModal({ visible, onClose }: Props) {
           </View>
 
           <Input label="Description (optional)" value={description} onChangeText={setDescription} placeholder="Any notes..." />
+
+          <View className="gap-1.5">
+            <Text className="text-xs font-medium text-gray-500">Photo (optional)</Text>
+            <TouchableOpacity
+              onPress={pickImage}
+              className="border border-dashed border-gray-300 rounded-lg h-32 items-center justify-center bg-gray-50"
+            >
+              {imageUri ? (
+                <Image source={{ uri: imageUri }} className="w-full h-full rounded-lg" resizeMode="cover" />
+              ) : (
+                <Text className="text-sm text-gray-400">Tap to pick an image</Text>
+              )}
+            </TouchableOpacity>
+          </View>
+
           {error && <Text className="text-xs text-red-400">{(error as Error).message}</Text>}
           <Button title="Create request" onPress={handleSubmit} loading={isPending} />
         </ScrollView>

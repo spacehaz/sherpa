@@ -14,4 +14,4 @@ export type TCreateOfferBody = {
   weight?: number
 }
 
-export type TCreateOffer = (body: TCreateOfferBody) => Promise<Offer>
+export type TCreateOffer = (body: TCreateOfferBody, imageUri?: string) => Promise<Offer>

@@ -6,6 +6,7 @@
 
 import { ItemCategory } from '@sherpa/shared';
 import { IsString, IsOptional, IsNumber, IsDateString, IsEnum } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateOfferDto {
   @IsString()
@@ -33,12 +34,15 @@ export class CreateOfferDto {
   size?: string;
 
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   weight?: number;
 
+  @Type(() => Number)
   @IsNumber()
   priceOriginal!: number;
 
+  @Type(() => Number)
   @IsNumber()
   markupPercent!: number;
 
