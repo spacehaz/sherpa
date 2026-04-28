@@ -6,7 +6,7 @@ import { TProps } from './types'
 import { createDeal } from '../../api/deals'
 import { useAppSelector } from '../../store/hooks'
 
-export default function OfferCard({ offer }: TProps) {
+export default function OfferCard({ offer, onDelete }: TProps) {
   const queryClient = useQueryClient()
   const currentUserId = useAppSelector(state => state.auth.user?.id)
   const buyerPrice = Math.round(offer.priceOriginal * (1 + offer.markupPercent / 100))
@@ -43,6 +43,9 @@ export default function OfferCard({ offer }: TProps) {
 
       {offer.userId !== currentUserId && (
         <Button title="Deal" onPress={() => mutate()} loading={isPending} />
+      )}
+      {onDelete && (
+        <Button title="Delete" variant="secondary" onPress={onDelete} />
       )}
     </Card>
   )

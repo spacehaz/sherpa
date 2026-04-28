@@ -34,6 +34,7 @@ export function CreateRequestModal({ visible, onClose }: Props) {
     mutationFn: createRequest,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['requests'] })
+      queryClient.invalidateQueries({ queryKey: ['my-requests'] })
       onClose()
       reset()
     },

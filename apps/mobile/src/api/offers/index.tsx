@@ -18,5 +18,9 @@ export const createOffer: TCreateOffer = async (body) => {
   return data
 }
 
+export const deleteOffer = async (id: string): Promise<void> => {
+  await apiClient.delete(`/offers/${id}`)
+}
+
 
 

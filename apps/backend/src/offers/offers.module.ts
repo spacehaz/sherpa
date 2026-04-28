@@ -10,10 +10,11 @@ import { OffersController } from './offers.controller';
 import { OffersRepository } from './offers.repository';
 import { OffersService } from './offers.service';
 import { AuthModule } from '../auth/auth.module';
+import { CloudinaryModule } from '../cloudinary/cloudinary.module';
 
 
 @Module({
-  imports: [AuthModule],
+  imports: [AuthModule, CloudinaryModule],
   controllers: [OffersController],
   providers: [OffersService, OffersRepository],
 })

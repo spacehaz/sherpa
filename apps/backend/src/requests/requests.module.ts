@@ -10,10 +10,11 @@ import { RequestsController } from './requests.controller';
 import { RequestsRepository } from './requests.repository';
 import { RequestsService } from './requests.service';
 import { AuthModule } from '../auth/auth.module';
+import { CloudinaryModule } from '../cloudinary/cloudinary.module';
 
 
 @Module({
-  imports: [AuthModule],
+  imports: [AuthModule, CloudinaryModule],
   controllers: [RequestsController],
   providers: [RequestsService, RequestsRepository],
 })

@@ -9,11 +9,13 @@ import { OffersRepository } from './offers.repository';
 import { UpdateOfferDto } from './dto/update-offer.dto';
 import { CreateOfferDto } from './dto/create-offer.dto';
 import { GetOffersQueryDto } from './dto/get-offers-query.dto';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
 
 @Injectable()
 export class OffersService {
   constructor(
     private readonly offersRepository: OffersRepository,
+    private readonly cloudinaryService: CloudinaryService,
   ) {}
 
   async update (
@@ -54,10 +56,14 @@ export class OffersService {
 
   async create (
     userId: string,
-    offerData: CreateOfferDto
+    offerData: CreateOfferDto,
+    file?: Express.Multer.File,
   ) {
-
-    return await this.offersRepository.create(userId, offerData)
+    let imageUrl: string | undefined
+    if (file) {
+      imageUrl = await this.cloudinaryService.uploadBuffer(file.buffer, 'sherpa/offers')
+    }
+    return await this.offersRepository.create(userId, offerData, imageUrl)
   }
 
   async findById (offerId: string) {

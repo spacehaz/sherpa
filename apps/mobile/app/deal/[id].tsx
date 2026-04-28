@@ -6,8 +6,11 @@ import {
 import { useLocalSearchParams, router } from 'expo-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { getDeal, getDealMessages, sendDealMessage, acceptMarkup, updateDealStatus } from '../../src/api/deals'
+import { createRating } from '../../src/api/users'
 import { useAppSelector } from '../../src/store/hooks'
 import { DealMessage } from '@sherpa/shared'
+
+const STARS = [1, 2, 3, 4, 5]
 
 export default function DealScreen() {
   const { id } = useLocalSearchParams<{ id: string }>()
@@ -16,6 +19,9 @@ export default function DealScreen() {
   const [text, setText] = useState('')
   const [proposing, setProposing] = useState(false)
   const [markup, setMarkup] = useState('')
+  const [rating, setRating] = useState(0)
+  const [ratingComment, setRatingComment] = useState('')
+  const [hasRated, setHasRated] = useState(false)
   const listRef = useRef<FlatList<DealMessage>>(null)
 
   const { data: deal, isLoading: dealLoading } = useQuery({
@@ -55,9 +61,24 @@ export default function DealScreen() {
     },
   })
 
+  const { mutate: submitRating, isPending: isRating } = useMutation({
+    mutationFn: () => createRating({
+      dealId: id,
+      toUserId: currentUserId === deal?.initiatorId ? deal!.responderId : deal!.initiatorId,
+      score: rating,
+      comment: ratingComment.trim() || undefined,
+    }),
+    onSuccess: () => {
+      setHasRated(true)
+      queryClient.invalidateQueries({ queryKey: ['users', 'me'] })
+    },
+  })
+
   const isResponder = currentUserId === deal?.responderId
   const isTraveler = currentUserId === deal?.travelerId
   const isInitiator = currentUserId === deal?.initiatorId
+  const isParticipant = isResponder || isInitiator
+  const showRating = deal?.status === 'completed' && isParticipant && !hasRated
 
   function handleSend() {
     const trimmed = text.trim()
@@ -89,42 +110,73 @@ export default function DealScreen() {
       </View>
 
       {deal && (
-        <View className="flex-row gap-2 px-4 py-2 border-b border-gray-100">
-          {isResponder && deal.status === 'pending' && (
-            <>
+        <View className="px-4 py-2 border-b border-gray-100 gap-2">
+          <View className="flex-row gap-2">
+            {isResponder && deal.status === 'pending' && (
+              <>
+                <TouchableOpacity
+                  onPress={() => updateStatus('accepted')}
+                  disabled={isUpdatingStatus}
+                  className="flex-1 bg-gray-800 rounded-lg py-2 items-center"
+                >
+                  <Text className="text-white text-xs font-medium">Accept deal</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => updateStatus('rejected')}
+                  disabled={isUpdatingStatus}
+                  className="flex-1 border border-gray-300 rounded-lg py-2 items-center"
+                >
+                  <Text className="text-gray-600 text-xs font-medium">Reject</Text>
+                </TouchableOpacity>
+              </>
+            )}
+            {isTraveler && deal.status === 'accepted' && (
               <TouchableOpacity
-                onPress={() => updateStatus('accepted')}
+                onPress={() => updateStatus('completed')}
                 disabled={isUpdatingStatus}
                 className="flex-1 bg-gray-800 rounded-lg py-2 items-center"
               >
-                <Text className="text-white text-xs font-medium">Accept deal</Text>
+                <Text className="text-white text-xs font-medium">Mark as completed</Text>
               </TouchableOpacity>
+            )}
+            {isInitiator && deal.status === 'pending' && (
               <TouchableOpacity
                 onPress={() => updateStatus('rejected')}
                 disabled={isUpdatingStatus}
                 className="flex-1 border border-gray-300 rounded-lg py-2 items-center"
               >
-                <Text className="text-gray-600 text-xs font-medium">Reject</Text>
+                <Text className="text-gray-600 text-xs font-medium">Cancel deal</Text>
               </TouchableOpacity>
-            </>
-          )}
-          {isTraveler && deal.status === 'accepted' && (
-            <TouchableOpacity
-              onPress={() => updateStatus('completed')}
-              disabled={isUpdatingStatus}
-              className="flex-1 bg-gray-800 rounded-lg py-2 items-center"
-            >
-              <Text className="text-white text-xs font-medium">Mark as completed</Text>
-            </TouchableOpacity>
-          )}
-          {isInitiator && deal.status === 'pending' && (
-            <TouchableOpacity
-              onPress={() => updateStatus('rejected')}
-              disabled={isUpdatingStatus}
-              className="flex-1 border border-gray-300 rounded-lg py-2 items-center"
-            >
-              <Text className="text-gray-600 text-xs font-medium">Cancel deal</Text>
-            </TouchableOpacity>
+            )}
+          </View>
+
+          {showRating && (
+            <View className="bg-gray-50 rounded-xl p-3 gap-2">
+              <Text className="text-xs font-semibold text-gray-600">Rate your experience</Text>
+              <View className="flex-row gap-2">
+                {STARS.map(s => (
+                  <TouchableOpacity key={s} onPress={() => setRating(s)}>
+                    <Text className="text-2xl">{s <= rating ? '★' : '☆'}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+              <TextInput
+                className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800"
+                placeholder="Add a comment (optional)"
+                value={ratingComment}
+                onChangeText={setRatingComment}
+                maxLength={300}
+              />
+              <TouchableOpacity
+                onPress={() => submitRating()}
+                disabled={rating === 0 || isRating}
+                className={`rounded-lg py-2 items-center ${rating === 0 ? 'bg-gray-200' : 'bg-gray-800'}`}
+              >
+                <Text className={`text-xs font-medium ${rating === 0 ? 'text-gray-400' : 'text-white'}`}>
+                  {isRating ? 'Submitting...' : 'Submit rating'}
+                </Text>
+              </TouchableOpacity>
+            </View>
           )}
         </View>
       )}

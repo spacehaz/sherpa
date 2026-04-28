@@ -34,6 +34,7 @@ export function CreateOfferModal({ visible, onClose }: Props) {
     mutationFn: createOffer,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['offers'] })
+      queryClient.invalidateQueries({ queryKey: ['my-offers'] })
       onClose()
       reset()
     },

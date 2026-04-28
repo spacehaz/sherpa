@@ -17,3 +17,7 @@ export const createRequest: TCreateRequest = async (body) => {
   const { data } = await apiClient.post<Request>('/requests', body)
   return data
 }
+
+export const deleteRequest = async (id: string): Promise<void> => {
+  await apiClient.delete(`/requests/${id}`)
+}

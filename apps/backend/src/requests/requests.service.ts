@@ -9,11 +9,13 @@ import { RequestsRepository } from './requests.repository';
 import { UpdateRequestDto } from './dto/update-request.dto';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { GetRequestsQueryDto } from './dto/get-requests-query.dto';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
 
 @Injectable()
 export class RequestsService {
   constructor(
     private readonly requestsRepository: RequestsRepository,
+    private readonly cloudinaryService: CloudinaryService,
   ) {}
 
   async update (
@@ -54,10 +56,14 @@ export class RequestsService {
 
   async create (
     userId: string,
-    requestData: CreateRequestDto
+    requestData: CreateRequestDto,
+    file?: Express.Multer.File,
   ) {
-
-    return await this.requestsRepository.create(userId, requestData)
+    let imageUrl: string | undefined
+    if (file) {
+      imageUrl = await this.cloudinaryService.uploadBuffer(file.buffer, 'sherpa/requests')
+    }
+    return await this.requestsRepository.create(userId, requestData, imageUrl)
   }
 
   async findById (requestId: string) {

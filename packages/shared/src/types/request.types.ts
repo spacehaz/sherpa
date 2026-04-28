@@ -14,6 +14,7 @@ export interface Request {
   from?: string;
   to: string;
   weight?: number;
+  imageUrl?: string;
   status: RequestStatus;
   createdAt: Date;
 }

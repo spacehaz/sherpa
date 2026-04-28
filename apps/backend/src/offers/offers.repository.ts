@@ -60,10 +60,11 @@ export class OffersRepository {
 
   create(
     userId: string,
-    dto: CreateOfferDto
+    dto: CreateOfferDto,
+    imageUrl?: string,
   ) {
     return this.prisma.offer.create({
-      data: { ...dto, deliveryDate: new Date(dto.deliveryDate), userId }
+      data: { ...dto, deliveryDate: new Date(dto.deliveryDate), userId, imageUrl }
     });
   }
 }

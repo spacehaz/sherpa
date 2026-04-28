@@ -10,7 +10,8 @@
  *   DELETE /api/requests/:id — protected, gets userId from @CurrentUser()
  */
 
-import { Controller, Get, Body, Patch, Post, UseGuards, Query, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Body, Patch, Post, UseGuards, Query, Param, Delete, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { RequestsService } from './requests.service';
 import { UpdateRequestDto } from './dto/update-request.dto';
 import { CreateRequestDto } from './dto/create-request.dto';
@@ -40,8 +41,13 @@ export class RequestsController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  createOffer(@CurrentUser() user: AuthUser, @Body() requestData: CreateRequestDto) {
-    return this.requestsService.create(user.id, requestData);
+  @UseInterceptors(FileInterceptor('image', { limits: { fileSize: 5 * 1024 * 1024 } }))
+  createOffer(
+    @CurrentUser() user: AuthUser,
+    @Body() requestData: CreateRequestDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    return this.requestsService.create(user.id, requestData, file);
   }
 
   @UseGuards(JwtAuthGuard)

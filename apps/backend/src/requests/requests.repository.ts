@@ -60,10 +60,11 @@ export class RequestsRepository {
 
   create(
     userId: string,
-    dto: CreateRequestDto
+    dto: CreateRequestDto,
+    imageUrl?: string,
   ) {
     return this.prisma.request.create({
-      data: { ...dto, deliveryDate: new Date(dto.deliveryDate), userId }
+      data: { ...dto, deliveryDate: new Date(dto.deliveryDate), userId, imageUrl }
     });
   }
 }

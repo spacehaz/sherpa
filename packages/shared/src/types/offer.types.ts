@@ -12,6 +12,7 @@ export interface Offer {
   deliveryDate: Date;
   size?: string;
   weight?: number;
+  imageUrl?: string;
   status: OfferStatus;
   from: string;
   to: string;
