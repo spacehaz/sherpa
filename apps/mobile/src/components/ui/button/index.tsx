@@ -10,14 +10,14 @@ export default function Button({ title, onPress, loading, disabled, variant = 'p
       disabled={disabled || loading}
       className={`
         py-3 px-5 rounded-lg items-center justify-center
-        ${isPrimary ? 'bg-gray-800' : 'bg-transparent border border-gray-800'}
+        ${isPrimary ? 'bg-primary' : 'bg-transparent border border-primary'}
         ${disabled || loading ? 'opacity-40' : 'opacity-100'}
       `}
     >
       {loading ? (
-        <ActivityIndicator color={isPrimary ? '#fff' : '#1f2937'} />
+        <ActivityIndicator color={isPrimary ? 'rgb(var(--color-on-primary))' : 'rgb(var(--color-primary))'} />
       ) : (
-        <Text className={`text-sm font-semibold ${isPrimary ? 'text-white' : 'text-gray-800'}`}>
+        <Text className={`text-sm font-semibold ${isPrimary ? 'text-on-primary' : 'text-primary'}`}>
           {title}
         </Text>
       )}

@@ -28,6 +28,11 @@ export const createOffer: TCreateOffer = async (body, imageUri?: string) => {
   return data
 }
 
+export const getOffer = async (id: string): Promise<Offer> => {
+  const { data } = await apiClient.get<Offer>(`/offers/${id}`)
+  return data
+}
+
 export const deleteOffer = async (id: string): Promise<void> => {
   await apiClient.delete(`/offers/${id}`)
 }

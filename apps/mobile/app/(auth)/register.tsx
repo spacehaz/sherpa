@@ -11,8 +11,8 @@ export default function RegisterScreen() {
   const { register, isLoading, error } = useAuth()
 
   return (
-    <View className="flex-1 px-6 pt-16 bg-white">
-      <Text className="text-2xl font-bold text-gray-800 mb-8">Create account</Text>
+    <View className="flex-1 px-6 pt-16 bg-background">
+      <Text className="text-2xl font-bold text-text mb-8">Create account</Text>
       <View className="gap-3 mb-6">
         <Input
           label="Name"

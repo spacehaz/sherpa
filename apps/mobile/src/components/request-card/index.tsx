@@ -29,27 +29,34 @@ export default function RequestCard({ request, onDelete }: TProps) {
         />
       )}
       <View className="flex-row items-center justify-between mb-2">
-        <Text className="text-base font-semibold text-gray-800 flex-1" numberOfLines={1}>
+        <Text className="text-base font-semibold text-text flex-1" numberOfLines={1}>
           {request.title}
         </Text>
-        <Text className="text-xs text-gray-400 ml-2">{request.status}</Text>
+        <Text className="text-xs text-muted ml-2">{request.status}</Text>
       </View>
 
       {request.store && (
-        <Text className="text-xs text-gray-400 mb-2">{request.store}</Text>
+        <Text className="text-xs text-muted mb-2">{request.store}</Text>
       )}
 
       <View className="flex-row items-center justify-between mb-3">
-        <Text className="text-sm text-gray-600">
+        <Text className="text-sm text-text">
           ${request.priceOriginal} + {request.markupPercent}% → ${buyerPrice}
         </Text>
-        <Text className="text-xs text-gray-400">
+        <Text className="text-xs text-muted">
           {new Date(request.deliveryDate).toLocaleDateString()}
         </Text>
       </View>
 
       {request.userId !== currentUserId && (
-        <Button title="Deal" onPress={() => mutate()} loading={isPending} />
+        <View className="flex-row gap-2">
+          <View className="flex-1">
+            <Button title="Deal" onPress={() => mutate()} loading={isPending} />
+          </View>
+          <View className="flex-1">
+            <Button title="Read" variant="secondary" onPress={() => router.push(`/request/${request.id}`)} />
+          </View>
+        </View>
       )}
       {onDelete && (
         <Button title="Delete" variant="secondary" onPress={onDelete} />

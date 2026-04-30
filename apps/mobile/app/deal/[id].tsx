@@ -3,8 +3,10 @@ import {
   View, Text, FlatList, TextInput, TouchableOpacity,
   KeyboardAvoidingView, Platform, ActivityIndicator,
 } from 'react-native'
+import Animated, { FadeInRight, FadeInLeft } from 'react-native-reanimated'
 import { useLocalSearchParams, router } from 'expo-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import * as Haptics from 'expo-haptics'
 import { getDeal, getDealMessages, sendDealMessage, acceptMarkup, updateDealStatus } from '../../src/api/deals'
 import { createRating } from '../../src/api/users'
 import { useAppSelector } from '../../src/store/hooks'
@@ -83,6 +85,7 @@ export default function DealScreen() {
   function handleSend() {
     const trimmed = text.trim()
     if (!trimmed || isPending) return
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
     const proposedMarkupPercent = proposing && markup ? parseFloat(markup) : undefined
     mutate({ message: trimmed, proposedMarkupPercent })
   }
@@ -91,42 +94,42 @@ export default function DealScreen() {
 
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-white"
+      className="flex-1 bg-background"
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={0}
     >
-      <View className="flex-row items-center px-4 pt-14 pb-4 border-b border-gray-100">
+      <View className="flex-row items-center px-4 pt-14 pb-4 border-b border-border">
         <TouchableOpacity onPress={() => router.back()} className="mr-3">
-          <Text className="text-gray-500 text-base">←</Text>
+          <Text className="text-muted text-base">←</Text>
         </TouchableOpacity>
         <View className="flex-1">
-          <Text className="text-base font-semibold text-gray-800" numberOfLines={1}>
+          <Text className="text-base font-semibold text-text" numberOfLines={1}>
             {dealLoading ? '...' : (item?.title ?? 'Deal')}
           </Text>
           {deal && (
-            <Text className="text-xs text-gray-400">{deal.status}</Text>
+            <Text className="text-xs text-muted">{deal.status}</Text>
           )}
         </View>
       </View>
 
       {deal && (
-        <View className="px-4 py-2 border-b border-gray-100 gap-2">
+        <View className="px-4 py-2 border-b border-border gap-2">
           <View className="flex-row gap-2">
             {isResponder && deal.status === 'pending' && (
               <>
                 <TouchableOpacity
                   onPress={() => updateStatus('accepted')}
                   disabled={isUpdatingStatus}
-                  className="flex-1 bg-gray-800 rounded-lg py-2 items-center"
+                  className="flex-1 bg-primary rounded-lg py-2 items-center"
                 >
-                  <Text className="text-white text-xs font-medium">Accept deal</Text>
+                  <Text className="text-on-primary text-xs font-medium">Accept deal</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => updateStatus('rejected')}
                   disabled={isUpdatingStatus}
-                  className="flex-1 border border-gray-300 rounded-lg py-2 items-center"
+                  className="flex-1 border border-border rounded-lg py-2 items-center"
                 >
-                  <Text className="text-gray-600 text-xs font-medium">Reject</Text>
+                  <Text className="text-text text-xs font-medium">Reject</Text>
                 </TouchableOpacity>
               </>
             )}
@@ -134,25 +137,25 @@ export default function DealScreen() {
               <TouchableOpacity
                 onPress={() => updateStatus('completed')}
                 disabled={isUpdatingStatus}
-                className="flex-1 bg-gray-800 rounded-lg py-2 items-center"
+                className="flex-1 bg-primary rounded-lg py-2 items-center"
               >
-                <Text className="text-white text-xs font-medium">Mark as completed</Text>
+                <Text className="text-on-primary text-xs font-medium">Mark as completed</Text>
               </TouchableOpacity>
             )}
             {isInitiator && deal.status === 'pending' && (
               <TouchableOpacity
                 onPress={() => updateStatus('rejected')}
                 disabled={isUpdatingStatus}
-                className="flex-1 border border-gray-300 rounded-lg py-2 items-center"
+                className="flex-1 border border-border rounded-lg py-2 items-center"
               >
-                <Text className="text-gray-600 text-xs font-medium">Cancel deal</Text>
+                <Text className="text-text text-xs font-medium">Cancel deal</Text>
               </TouchableOpacity>
             )}
           </View>
 
           {showRating && (
-            <View className="bg-gray-50 rounded-xl p-3 gap-2">
-              <Text className="text-xs font-semibold text-gray-600">Rate your experience</Text>
+            <View className="bg-surface rounded-xl p-3 gap-2">
+              <Text className="text-xs font-semibold text-text">Rate your experience</Text>
               <View className="flex-row gap-2">
                 {STARS.map(s => (
                   <TouchableOpacity key={s} onPress={() => setRating(s)}>
@@ -161,7 +164,7 @@ export default function DealScreen() {
                 ))}
               </View>
               <TextInput
-                className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800"
+                className="bg-background border border-border rounded-lg px-3 py-2 text-sm text-text"
                 placeholder="Add a comment (optional)"
                 value={ratingComment}
                 onChangeText={setRatingComment}
@@ -170,9 +173,9 @@ export default function DealScreen() {
               <TouchableOpacity
                 onPress={() => submitRating()}
                 disabled={rating === 0 || isRating}
-                className={`rounded-lg py-2 items-center ${rating === 0 ? 'bg-gray-200' : 'bg-gray-800'}`}
+                className={`rounded-lg py-2 items-center ${rating === 0 ? 'bg-border' : 'bg-primary'}`}
               >
-                <Text className={`text-xs font-medium ${rating === 0 ? 'text-gray-400' : 'text-white'}`}>
+                <Text className={`text-xs font-medium ${rating === 0 ? 'text-muted' : 'text-on-primary'}`}>
                   {isRating ? 'Submitting...' : 'Submit rating'}
                 </Text>
               </TouchableOpacity>
@@ -198,23 +201,26 @@ export default function DealScreen() {
           renderItem={({ item: msg }) => {
             const isMine = msg.senderId === currentUserId
             return (
-              <View className={`max-w-[80%] ${isMine ? 'self-end' : 'self-start'}`}>
-                <View className={`rounded-2xl px-4 py-2 ${isMine ? 'bg-gray-800' : 'bg-gray-100'}`}>
-                  <Text className={`text-sm ${isMine ? 'text-white' : 'text-gray-800'}`}>
+              <Animated.View
+                entering={(isMine ? FadeInRight : FadeInLeft).springify().damping(14).stiffness(120)}
+                className={`max-w-[80%] ${isMine ? 'self-end' : 'self-start'}`}
+              >
+                <View className={`rounded-2xl px-4 py-2 ${isMine ? 'bg-primary' : 'bg-surface'}`}>
+                  <Text className={`text-sm ${isMine ? 'text-on-primary' : 'text-text'}`}>
                     {msg.message}
                   </Text>
                   {msg.proposedMarkupPercent != null && (
-                    <View className={`mt-2 px-2 py-1 rounded-lg ${isMine ? 'bg-gray-700' : 'bg-gray-200'}`}>
-                      <Text className={`text-xs font-medium ${isMine ? 'text-gray-200' : 'text-gray-600'}`}>
+                    <View className={`mt-2 px-2 py-1 rounded-lg ${isMine ? 'bg-primary/70' : 'bg-border'}`}>
+                      <Text className={`text-xs font-medium ${isMine ? 'text-on-primary' : 'text-text'}`}>
                         Proposed markup: {msg.proposedMarkupPercent}%
                       </Text>
                       {!isMine && deal?.status === 'pending' && (
                         <TouchableOpacity
                           onPress={() => acceptMarkupMutate(msg.proposedMarkupPercent!)}
                           disabled={isAccepting}
-                          className="mt-1 bg-gray-800 rounded px-2 py-1 items-center"
+                          className="mt-1 bg-primary rounded px-2 py-1 items-center"
                         >
-                          <Text className="text-white text-xs font-medium">
+                          <Text className="text-on-primary text-xs font-medium">
                             {isAccepting ? 'Accepting...' : 'Accept'}
                           </Text>
                         </TouchableOpacity>
@@ -222,21 +228,21 @@ export default function DealScreen() {
                     </View>
                   )}
                 </View>
-                <Text className={`text-xs text-gray-400 mt-1 ${isMine ? 'text-right' : 'text-left'}`}>
+                <Text className={`text-xs text-muted mt-1 ${isMine ? 'text-right' : 'text-left'}`}>
                   {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </Text>
-              </View>
+              </Animated.View>
             )
           }}
         />
       )}
 
-      <View className="px-4 pt-3 pb-3 border-t border-gray-100 gap-2">
+      <View className="px-4 pt-3 pb-3 border-t border-border gap-2">
         {proposing && (
           <View className="flex-row items-center gap-2">
             <Text className="text-xs text-gray-500">Markup %</Text>
             <TextInput
-              className="flex-1 bg-gray-100 rounded-xl px-3 py-2 text-sm text-gray-800"
+              className="flex-1 bg-surface rounded-xl px-3 py-2 text-sm text-text"
               placeholder="e.g. 10.5"
               value={markup}
               onChangeText={setMarkup}
@@ -248,13 +254,13 @@ export default function DealScreen() {
         <View className="flex-row items-end gap-2">
           <TouchableOpacity
             onPress={() => { setProposing(p => !p); setMarkup('') }}
-            className={`px-3 py-3 rounded-2xl ${proposing ? 'bg-gray-800' : 'bg-gray-100'}`}
+            className={`px-3 py-3 rounded-2xl ${proposing ? 'bg-primary' : 'bg-surface'}`}
           >
-            <Text className={`text-xs font-medium ${proposing ? 'text-white' : 'text-gray-500'}`}>%</Text>
+            <Text className={`text-xs font-medium ${proposing ? 'text-on-primary' : 'text-muted'}`}>%</Text>
           </TouchableOpacity>
 
           <TextInput
-            className="flex-1 bg-gray-100 rounded-2xl px-4 py-3 text-sm text-gray-800"
+            className="flex-1 bg-surface rounded-2xl px-4 py-3 text-sm text-text"
             placeholder="Type a message..."
             value={text}
             onChangeText={setText}
@@ -265,7 +271,7 @@ export default function DealScreen() {
           <TouchableOpacity
             onPress={handleSend}
             disabled={!text.trim() || isPending}
-            className={`w-10 h-10 rounded-full items-center justify-center ${!text.trim() || isPending ? 'bg-gray-200' : 'bg-gray-800'}`}
+            className={`w-10 h-10 rounded-full items-center justify-center ${!text.trim() || isPending ? 'bg-border' : 'bg-primary'}`}
           >
             {isPending ? (
               <ActivityIndicator color="#fff" size="small" />

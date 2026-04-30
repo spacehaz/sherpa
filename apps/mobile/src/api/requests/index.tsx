@@ -28,6 +28,11 @@ export const createRequest: TCreateRequest = async (body, imageUri?: string) => 
   return data
 }
 
+export const getRequest = async (id: string): Promise<Request> => {
+  const { data } = await apiClient.get<Request>(`/requests/${id}`)
+  return data
+}
+
 export const deleteRequest = async (id: string): Promise<void> => {
   await apiClient.delete(`/requests/${id}`)
 }

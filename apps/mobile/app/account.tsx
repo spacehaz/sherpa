@@ -5,12 +5,14 @@ import { useAppSelector } from '../src/store/hooks'
 import { useAuth } from '../src/hooks/use-auth'
 import { getMe, updateMe, getUserRatings } from '../src/api/users'
 import { Button, Input } from '../src/components/ui'
+import { useTheme } from '../src/theme/ThemeProvider'
 import { router } from 'expo-router'
 
 export default function AccountScreen() {
   const queryClient = useQueryClient()
   const currentUserId = useAppSelector(state => state.auth.user?.id)
   const { logout } = useAuth()
+  const { theme, toggle } = useTheme()
   const [editing, setEditing] = useState(false)
   const [name, setName] = useState('')
   const [gender, setGender] = useState('')
@@ -45,11 +47,11 @@ export default function AccountScreen() {
   const avgRating = user?.rating ? user.rating.toFixed(1) : '—'
 
   return (
-    <ScrollView className="flex-1 bg-white" contentContainerStyle={{ padding: 24, paddingTop: 64 }}>
+    <ScrollView className="flex-1 bg-background" contentContainerStyle={{ padding: 24, paddingTop: 64 }}>
       <View className="flex-row items-center justify-between mb-6">
-        <Text className="text-2xl font-bold text-gray-800">Account</Text>
+        <Text className="text-2xl font-bold text-text">Account</Text>
         <TouchableOpacity onPress={() => router.back()}>
-          <Text className="text-gray-400 text-sm">Back</Text>
+          <Text className="text-muted text-sm">Back</Text>
         </TouchableOpacity>
       </View>
 
@@ -69,13 +71,13 @@ export default function AccountScreen() {
         </View>
       ) : (
         <View className="mb-6">
-          <Text className="text-lg font-semibold text-gray-800">{user?.name}</Text>
-          <Text className="text-sm text-gray-400 mb-2">{user?.email}</Text>
-          {user?.hometown && <Text className="text-sm text-gray-500">{user.hometown}</Text>}
-          {user?.gender && <Text className="text-sm text-gray-500 capitalize">{user.gender}</Text>}
+          <Text className="text-lg font-semibold text-text">{user?.name}</Text>
+          <Text className="text-sm text-muted mb-2">{user?.email}</Text>
+          {user?.hometown && <Text className="text-sm text-muted">{user.hometown}</Text>}
+          {user?.gender && <Text className="text-sm text-muted capitalize">{user.gender}</Text>}
           <View className="flex-row items-center mt-3 mb-4">
-            <Text className="text-2xl font-bold text-gray-800 mr-1">{avgRating}</Text>
-            <Text className="text-gray-400 text-sm">/ 5 · {ratings.length} reviews</Text>
+            <Text className="text-2xl font-bold text-text mr-1">{avgRating}</Text>
+            <Text className="text-muted text-sm">/ 5 · {ratings.length} reviews</Text>
           </View>
           <Button title="Edit profile" variant="secondary" onPress={startEditing} />
         </View>
@@ -83,15 +85,15 @@ export default function AccountScreen() {
 
       {ratings.length > 0 && (
         <View>
-          <Text className="text-sm font-semibold text-gray-500 mb-3">Reviews</Text>
+          <Text className="text-sm font-semibold text-muted mb-3">Reviews</Text>
           <View className="gap-3">
             {ratings.map(r => (
-              <View key={r.id} className="bg-gray-50 rounded-xl p-4">
+              <View key={r.id} className="bg-surface rounded-xl p-4">
                 <View className="flex-row items-center justify-between mb-1">
-                  <Text className="text-sm font-semibold text-gray-800">{'★'.repeat(r.score)}{'☆'.repeat(5 - r.score)}</Text>
-                  <Text className="text-xs text-gray-400">{new Date(r.createdAt).toLocaleDateString()}</Text>
+                  <Text className="text-sm font-semibold text-text">{'★'.repeat(r.score)}{'☆'.repeat(5 - r.score)}</Text>
+                  <Text className="text-xs text-muted">{new Date(r.createdAt).toLocaleDateString()}</Text>
                 </View>
-                {r.comment && <Text className="text-sm text-gray-600">{r.comment}</Text>}
+                {r.comment && <Text className="text-sm text-text">{r.comment}</Text>}
               </View>
             ))}
           </View>
@@ -99,6 +101,11 @@ export default function AccountScreen() {
       )}
 
       <View className="mt-8 gap-3">
+        <Button
+          title={theme === 'light' ? 'Switch to Dark' : 'Switch to Light'}
+          variant="secondary"
+          onPress={toggle}
+        />
         <Button title="Log out" variant="secondary" onPress={logout} />
       </View>
     </ScrollView>

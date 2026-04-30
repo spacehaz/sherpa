@@ -44,23 +44,22 @@ export class DealsService {
       throw new BadRequestException('Cannot update a deal that is already completed or rejected');
     }
 
-    if (newStatus === 'accepted' || newStatus === 'rejected') {
-      const { responderId } = deal
-      if (userId === responderId) {
-        // request made by someone who is responding
-        const updatedDeal = await this.dealsRepository.updateStatus(dealId, {
-          status: newStatus
-        })
-
-        if (newStatus === 'accepted') {
-          await this.dealsRepository.rejectOtherDeals(dealId, deal.offerId || undefined, deal.requestId || undefined)
-        }
-
-        return updatedDeal
-
-      } else {
-        throw new ForbiddenException('Cannot update a deal status to accepted/rejected. Only responder can do it');
+    if (newStatus === 'rejected') {
+      const { responderId, initiatorId } = deal
+      if (userId === responderId || userId === initiatorId) {
+        return await this.dealsRepository.updateStatus(dealId, { status: newStatus })
       }
+      throw new ForbiddenException('Only the responder or initiator can reject a deal');
+    }
+
+    if (newStatus === 'accepted') {
+      const { responderId } = deal
+      if (userId !== responderId) {
+        throw new ForbiddenException('Only the responder can accept a deal');
+      }
+      const updatedDeal = await this.dealsRepository.updateStatus(dealId, { status: newStatus })
+      await this.dealsRepository.rejectOtherDeals(dealId, deal.offerId || undefined, deal.requestId || undefined)
+      return updatedDeal
     }
 
 

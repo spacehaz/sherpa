@@ -14,7 +14,7 @@ export default function Input({
   return (
     <View className="gap-1.5">
       {label && (
-        <Text className="text-xs font-medium text-gray-500">{label}</Text>
+        <Text className="text-xs font-medium text-muted">{label}</Text>
       )}
       <TextInput
         value={value}
@@ -26,8 +26,8 @@ export default function Input({
         autoCapitalize={autoCapitalize}
         style={{ height: 48 }}
         className={`
-          border rounded-lg px-4 text-sm text-gray-800 bg-gray-50
-          ${error ? 'border-red-400' : 'border-gray-200'}
+          border rounded-lg px-4 text-sm text-text bg-surface
+          ${error ? 'border-red-400' : 'border-border'}
         `}
       />
       {error && (

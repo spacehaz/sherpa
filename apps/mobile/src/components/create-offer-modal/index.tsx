@@ -77,24 +77,24 @@ export function CreateOfferModal({ visible, onClose }: Props) {
 
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
-      <View className="flex-1 bg-white">
-        <View className="flex-row items-center justify-between px-6 pt-6 pb-4 border-b border-gray-100">
-          <Text className="text-xl font-bold text-gray-800">New offer</Text>
+      <View className="flex-1 bg-background">
+        <View className="flex-row items-center justify-between px-6 pt-6 pb-4 border-b border-border">
+          <Text className="text-xl font-bold text-text">New offer</Text>
           <TouchableOpacity onPress={() => { onClose(); reset() }}>
-            <Text className="text-gray-400 text-base">Cancel</Text>
+            <Text className="text-muted text-base">Cancel</Text>
           </TouchableOpacity>
         </View>
         <ScrollView className="flex-1 px-6 pt-4" contentContainerStyle={{ gap: 12, paddingBottom: 32 }}>
           <Input label="Title" value={title} onChangeText={setTitle} placeholder="iPhone 15 Pro" />
 
           <View className="gap-1.5">
-            <Text className="text-xs font-medium text-gray-500">Category</Text>
+            <Text className="text-xs font-medium text-muted">Category</Text>
             <TouchableOpacity
               onPress={() => { setShowCategoryPicker(!showCategoryPicker); setShowDatePicker(false) }}
               style={{ height: 48 }}
-              className="border border-gray-200 rounded-lg px-4 bg-gray-50 justify-center"
+              className="border border-border rounded-lg px-4 bg-surface justify-center"
             >
-              <Text className="text-sm text-gray-800">{categoryLabel}</Text>
+              <Text className="text-sm text-text">{categoryLabel}</Text>
             </TouchableOpacity>
             {showCategoryPicker && (
               <Picker
@@ -114,13 +114,13 @@ export function CreateOfferModal({ visible, onClose }: Props) {
           <Input label="Markup %" value={markupPercent} onChangeText={setMarkupPercent} placeholder="10" keyboardType="decimal-pad" />
 
           <View className="gap-1.5">
-            <Text className="text-xs font-medium text-gray-500">Delivery date</Text>
+            <Text className="text-xs font-medium text-muted">Delivery date</Text>
             <TouchableOpacity
               onPress={() => { setShowDatePicker(!showDatePicker); setShowCategoryPicker(false) }}
               style={{ height: 48 }}
-              className="border border-gray-200 rounded-lg px-4 bg-gray-50 justify-center"
+              className="border border-border rounded-lg px-4 bg-surface justify-center"
             >
-              <Text className="text-sm text-gray-800">{deliveryDate.toLocaleDateString()}</Text>
+              <Text className="text-sm text-text">{deliveryDate.toLocaleDateString()}</Text>
             </TouchableOpacity>
             {showDatePicker && (
               <DateTimePicker
@@ -135,15 +135,15 @@ export function CreateOfferModal({ visible, onClose }: Props) {
           <Input label="Description (optional)" value={description} onChangeText={setDescription} placeholder="Any notes..." />
 
           <View className="gap-1.5">
-            <Text className="text-xs font-medium text-gray-500">Photo (optional)</Text>
+            <Text className="text-xs font-medium text-muted">Photo (optional)</Text>
             <TouchableOpacity
               onPress={pickImage}
-              className="border border-dashed border-gray-300 rounded-lg h-32 items-center justify-center bg-gray-50"
+              className="border border-dashed border-border rounded-lg h-32 items-center justify-center bg-surface"
             >
               {imageUri ? (
                 <Image source={{ uri: imageUri }} className="w-full h-full rounded-lg" resizeMode="cover" />
               ) : (
-                <Text className="text-sm text-gray-400">Tap to pick an image</Text>
+                <Text className="text-sm text-muted">Tap to pick an image</Text>
               )}
             </TouchableOpacity>
           </View>
